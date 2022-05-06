@@ -8,6 +8,72 @@ options = webdriver.ChromeOptions()
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 driver = webdriver.Chrome('./chromedriver', options=options)
 
+def get_winrate(summoners_id, champ_name):
+    winrate_url = f'https://www.op.gg/summoners/kr/{summoners_id}/champions'
+    driver.get(winrate_url) 
+    driver.find_element_by_xpath('//*[@id="content-container"]/div/div/div[2]/button[2]').click()
+    time.sleep(1) 
+    html = driver.page_source
+    soup = BeautifulSoup(html, 'html.parser')
+    driver.close()
+    info = soup.find_all('td', class_='rank css-1wvfkid exo2f211')
+    for champ_info in info:
+        champ_info = champ_info.find_next_sibling('td')
+        champ = champ_info.find('div', class_='summoner-name').find('a').get('href').split('/')[2]
+        if champ == champ_name:
+            continue
+        winrate = int(champ_info.find_next_sibling('td').find('span').text[:-1])
+        try:
+            num_win_match = int(champ_info.find_next_sibling('td').find('div',class_='winratio-graph__text left').text[:-1])
+        except:
+            num_win_match = 0
+        try:
+            num_lose_match = int(champ_info.find_next_sibling('td').find('div',class_='winratio-graph__text right').text[:-1])
+        except:
+            num_lose_match = 0
+        
+    return champ, winrate, num_win_match+num_lose_match
+
+def get_matches():
+    '''
+        ref docstring!
+
+        output: match: (blue_top_summoner_id, blue_top_champ_name, ...)
+    '''
+    return
+
+def get_ids():
+    return
+
+def champ_embedding(champ_name):
+    # TODO: 
+    # 1. convert name of champion in .csv to lowercase and only alphabet
+    # 2. find good embedding method
+    return
+
+# (blue_team_info, red_team_info), (result)
+# blue_team_info: (top_champ, top_champ_winrate, top_champ_match_count, jg ..., mid ..., sup ...)
+# TODO:
+# 1. decide whether use DB or pandas or numpy file to save data
+def generate_dataset():
+    sunmmoner_ids = get_ids()
+
+    matches_data = []
+    matches_result_data = []
+    matches = get_matches()
+    for match in matches:
+        match_vector = []
+        for i in range(5):
+            champ, winrate, match_count = get_winrate(match[2*i],match[2*i+1])
+            champ = champ_embedding(champ)
+            match_vector.append(champ) 
+        matches_result_data.append(match[-1])
+    
+    # save train_data and test_data
+
+if __name__ == '__main__':
+    generate_dataset()
+
 # headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36'}
 # summoners_id_list = []
 # for page_num in range(1,2):
@@ -37,11 +103,13 @@ summoners_id_list = ['타 잔']
 winrate_url = f'https://www.op.gg/summoners/kr/{summoners_id}/champions'
 
 for summoners_id in summoners_id_list:
-    print(summoners_id)
+    get_winrate(summoners_id, 'lee sin')
+    """print(summoners_id)
     info_url = f'https://www.op.gg/summoners/kr/{summoners_id}'
     driver.get(info_url) 
     time.sleep(2) 
     html = driver.page_source
+    #driver.close()
     soup = BeautifulSoup(html, 'html.parser')
     # match_info
     for tag in soup.find_all('li',class_='css-1qq23jn e1iiyghw3'):
@@ -85,6 +153,6 @@ for summoners_id in summoners_id_list:
         print(blue_team_id)
         print('red')
         print(red_team_champ)
-        print(red_team_id)
+        print(red_team_id)"""
 
-    break
+

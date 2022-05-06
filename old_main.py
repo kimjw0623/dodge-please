@@ -6,11 +6,11 @@ import time
 
   
 # initiating the webdriver. Parameter includes the path of the webdriver.
-driver = webdriver.Chrome('./chromedriver') 
+#driver = webdriver.Chrome('./chromedriver') 
 
 
 
-# headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36'}
+headers = {'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.54 Safari/537.36'}
 # summoners_id_list = []
 # for page_num in range(1,2):
 #     url = f'https://www.op.gg/leaderboards/tier?page={page_num}&region=kr'
@@ -41,11 +41,11 @@ winrate_url = f'https://www.op.gg/summoners/kr/{summoners_id}/champions'
 for summoners_id in summoners_id_list:
     print(summoners_id)
     info_url = f'https://www.op.gg/summoners/kr/{summoners_id}'
-    driver.get(info_url) 
-    time.sleep(2) 
-    html = driver.page_source
-    #info_resp = requests.get(info_url,headers = headers)
-    soup = BeautifulSoup(html, 'html.parser')
+    # driver.get(info_url) 
+    # time.sleep(2) 
+    # html = driver.page_source
+    info_resp = requests.get(info_url,headers = headers)
+    soup = BeautifulSoup(info_resp, 'html.parser')
     
     #print(soup.find_all('div',class_='game_result'))
     #print(soup.find_all('li',class_='css-1sq1kbv e3mqlfu0'))
