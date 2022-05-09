@@ -12,7 +12,7 @@ driver = webdriver.Chrome('./chromedriver', options=options)
 
 summoners_id_list = []
 #page_num=1
-for page_num in range(1,11):
+for page_num in range(21,41):
     info_url = f'https://www.op.gg/leaderboards/tier?page={page_num}&region=kr'
     driver.get(info_url) 
     html = driver.page_source
@@ -33,7 +33,9 @@ for page_num in range(1,11):
     for i in range(len(rows)-1):
         summoners_id_list.append(rows[i+1].find('strong').text)
 
-with open('id_list.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+with open('id_list_2000_4000.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
     for i in range(len(summoners_id_list)):
         spamwriter.writerow([i,summoners_id_list[i]])
+
+driver.quit()

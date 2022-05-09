@@ -1,16 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-# import pymongo
+import csv
+import ast
 
-# conn = pymongo.MongoClient()
-# db_opgg = conn.opgg
-# db_opgg_rank = db_opgg.rank
-
-opgg_link = 'https://www.op.gg/ranking/ladder/' #API 요청 링크
-data = requests.get(opgg_link).content
-soup = BeautifulSoup(data, 'html.parser')
-
-# 1 ~ 5 ranking highest
-ranking_highest = soup.select('li.ranking-highest__item')
-print(ranking_highest)
+with open('more_match_info_list_1000.csv', mode='r', encoding='utf-8-sig') as inp:
+    reader = csv.reader(inp)
+    for rows in reader:
+        print(len(ast.literal_eval(rows[1])))
+        break
