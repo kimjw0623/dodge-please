@@ -8,6 +8,8 @@ import ast
 # "[['Riven', 'Azhy', 'RekSai', 'kratosase', 'Zoe', 'qwesadz', 'Kaisa', '잘생긴오현택', 'Nautilus', '후회없는인생살게', 'Qiyana', 'EQWEQWRGFREGRE', 'Hecarim', 'lilliillilllilii', 'Swain', 'QXAL972184346', 'Samira', 'yiqunlanzi', 'Sett', 'liang mian']
 #   [True, '17분 48초']]"
 
+unknown_ids = {}
+
 def get_unique_matches(file_name):
     match_list = []
     with open(file_name, mode='r', encoding='utf-8-sig') as inp:
@@ -107,13 +109,31 @@ def get_id_champ_info(info_dict, champion, player_id):
     except:
         winrate = -2
         total_match = -2
+        if not player_id in unknown_ids:
+            unknown_ids[player_id] = 1
+        else:
+            unknown_ids[player_id] += 1
+        #unknown_ids.append(player_id)
     
     return winrate, total_match
+
+# Return champ embedding vector
+def champ_embedding():
+    dict_from_csv = {}
+    regex = re.compile('[^a-zA-Z]')
+
+    with open('champ_list.csv', mode='r') as inp:
+        reader = csv.reader(inp)
+        dict_from_csv = {regex.sub('', rows[1]).lower():rows[0] for rows in reader}
+
+    return dict_from_csv
+
+champ_vector_dict = champ_embedding()
 
 regex = re.compile('[^a-zA-Z]')
 
 matches_1000 = get_unique_matches('match_info_list_1000.csv')
-#matches_1000_2000 = get_unique_matches('match_info_list_1000_2000.csv')
+# matches_1000_2000 = get_unique_matches('match_info_list_1000_2000.csv')
 
 match_list = list(set(matches_1000))# + matches_1000_2000))
 
@@ -129,6 +149,7 @@ for match in match_list:
     for i in range(10):
         champ = regex.sub('', match[0][2*i]).lower()
         winrate, match_count = get_id_champ_info(id_info_dict, champ, match[0][2*i + 1])
+        champ = int(champ_vector_dict[champ])
         match_vector.append(champ) 
         match_vector.append(int(winrate))
         match_vector.append(int(match_count))
@@ -136,3 +157,7 @@ for match in match_list:
     match_dataset.append(match_vector)
 
 print(match_dataset[:10])
+
+#unknown_ids = list(set(unknown_ids))
+
+#print(len(unknown_ids))

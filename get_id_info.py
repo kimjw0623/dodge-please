@@ -15,13 +15,13 @@ driver = webdriver.Chrome('./chromedriver', options=options)
 ids = []
 results = []
 
-with open('id_list_2000_4000.csv', mode='r', encoding='utf-8-sig') as inp:
+with open('id_list_10000.csv', mode='r', encoding='utf-8-sig') as inp:
     reader = csv.reader(inp)
     for rows in reader:
         ids.append(rows[1])
 
 #ids = ids[:100]
-with open('id_info_list_2000_4000.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+with open('id_info_list_10000.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
     for summoners_id in ids:
         print(summoners_id)

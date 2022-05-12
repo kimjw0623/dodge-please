@@ -5,6 +5,23 @@ from selenium.webdriver.common.keys import Keys
 import time
 import csv
 
+# id_list = []
+# #info_list = []
+# with open('id_list.csv', mode='r', encoding='utf-8-sig') as inp:
+#     reader = csv.reader(inp)
+#     for rows in reader:
+#         id_list.append(rows[1])
+
+# with open('id_list_1000_2000.csv', mode='r', encoding='utf-8-sig') as inp:
+#     reader = csv.reader(inp)
+#     for rows in reader:
+#         id_list.append(rows[1])
+
+# with open('id_list_2000_4000.csv', mode='r', encoding='utf-8-sig') as inp:
+#     reader = csv.reader(inp)
+#     for rows in reader:
+#         id_list.append(rows[1])
+
 options = webdriver.ChromeOptions()
 options.add_experimental_option('excludeSwitches', ['enable-logging'])
 driver = webdriver.Chrome('./chromedriver', options=options)
@@ -12,12 +29,12 @@ driver = webdriver.Chrome('./chromedriver', options=options)
 
 summoners_id_list = []
 #page_num=1
-for page_num in range(21,41):
+for page_num in range(1,151):
     info_url = f'https://www.op.gg/leaderboards/tier?page={page_num}&region=kr'
     driver.get(info_url) 
     html = driver.page_source
     soup = BeautifulSoup(html, 'html.parser')
-
+    time.sleep(3)
     # Get top5 summoners
     if page_num == 1:
         top5 = soup.select_one('div', class_='css-1j84o5i ei93w703')
@@ -33,7 +50,7 @@ for page_num in range(21,41):
     for i in range(len(rows)-1):
         summoners_id_list.append(rows[i+1].find('strong').text)
 
-with open('id_list_2000_4000.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+with open('id_list_10000.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
     for i in range(len(summoners_id_list)):
         spamwriter.writerow([i,summoners_id_list[i]])
