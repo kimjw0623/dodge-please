@@ -26,8 +26,12 @@ with open('id_info_list_10000.csv', 'w', newline='', encoding='utf-8-sig') as cs
     for summoners_id in ids:
         print(summoners_id)
         winrate_url = f'https://www.op.gg/summoners/kr/{summoners_id}/champions'
-        driver.get(winrate_url) 
-        time.sleep(4)
+        try:
+            driver.get(winrate_url) 
+        except:
+            results.append([0])
+            continue
+        time.sleep(5)
         #driver.find_element_by_xpath('//*[@id="content-container"]/div/div/div[2]/button[2]').click()
         html = driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
@@ -67,11 +71,5 @@ with open('id_info_list_10000.csv', 'w', newline='', encoding='utf-8-sig') as cs
             id_info.append((champ, winrate, num_win_match, num_lose_match))
         
         spamwriter.writerow(id_info)
-        #results.append(id_info)
-    
-# with open('id_info_list_1000_2000.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
-#     spamwriter = csv.writer(csvfile)
-#     for i in range(len(results)):
-#         spamwriter.writerow([i,results[i]])
-
+        
 driver.quit()
