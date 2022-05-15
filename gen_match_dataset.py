@@ -58,32 +58,32 @@ def gen_id_info_dict():
     id_to_info = {}
     id_list = []
     info_list = []
-    with open('id_list.csv', mode='r', encoding='utf-8-sig') as inp:
+    with open('id_list_10000.csv', mode='r', encoding='utf-8-sig') as inp:
         reader = csv.reader(inp)
         for rows in reader:
             id_list.append(rows[1])
 
-    with open('id_list_1000_2000.csv', mode='r', encoding='utf-8-sig') as inp:
-        reader = csv.reader(inp)
-        for rows in reader:
-            id_list.append(rows[1])
+    # with open('id_list_1000_2000.csv', mode='r', encoding='utf-8-sig') as inp:
+    #     reader = csv.reader(inp)
+    #     for rows in reader:
+    #         id_list.append(rows[1])
 
-    with open('id_list_2000_4000.csv', mode='r', encoding='utf-8-sig') as inp:
-        reader = csv.reader(inp)
-        for rows in reader:
-            id_list.append(rows[1])
+    # with open('id_list_2000_4000.csv', mode='r', encoding='utf-8-sig') as inp:
+    #     reader = csv.reader(inp)
+    #     for rows in reader:
+    #         id_list.append(rows[1])
 
-    with open('id_info_list_1000.csv', mode='r', encoding='utf-8-sig') as inp:
-        reader = csv.reader(inp)
-        for rows in reader:
-            info_list.append(ast.literal_eval(rows[1]))
+    # with open('id_info_list_1000.csv', mode='r', encoding='utf-8-sig') as inp:
+    #     reader = csv.reader(inp)
+    #     for rows in reader:
+    #         info_list.append(ast.literal_eval(rows[1]))
 
-    with open('id_info_list_1000_2000.csv', mode='r', encoding='utf-8-sig') as inp:
-        reader = csv.reader(inp)
-        for rows in reader:
-            info_list.append(ast.literal_eval(rows[1]))
+    # with open('id_info_list_1000_2000.csv', mode='r', encoding='utf-8-sig') as inp:
+    #     reader = csv.reader(inp)
+    #     for rows in reader:
+    #         info_list.append(ast.literal_eval(rows[1]))
 
-    with open('id_info_list_2000_4000.csv', mode='r', encoding='utf-8-sig') as inp:
+    with open('id_info_list_10000.csv', mode='r', encoding='utf-8-sig') as inp:
         reader = csv.reader(inp)
         for rows in reader:
             small_list = []
@@ -102,7 +102,10 @@ def get_id_champ_info(info_dict, champion, player_id):
     try:
         for elem in info_dict[player_id]:
             champ = regex.sub('', elem[0]).lower()
+            print(champ)
+            print(champion)
             if champ == champion:
+                print(elem)
                 winrate = elem[1]
                 total_match = elem[2] + elem[3]
                 break
@@ -124,7 +127,9 @@ def champ_embedding():
 
     with open('champ_list.csv', mode='r') as inp:
         reader = csv.reader(inp)
-        dict_from_csv = {regex.sub('', rows[1]).lower():rows[0] for rows in reader}
+        for rows in reader:
+            dict_from_csv[regex.sub('', rows[1]).lower()] = rows[0]
+        #dict_from_csv[] = {regex.sub('', rows[1]).lower():rows[0] for rows in reader}
 
     return dict_from_csv
 
@@ -133,17 +138,20 @@ champ_vector_dict = champ_embedding()
 regex = re.compile('[^a-zA-Z]')
 
 matches_1000 = get_unique_matches('match_info_list_1000.csv')
-# matches_1000_2000 = get_unique_matches('match_info_list_1000_2000.csv')
+#matches_1000_2000 = get_unique_matches('match_info_list_1000_2000.csv')
 
 match_list = list(set(matches_1000))# + matches_1000_2000))
 
 #get_statistics(match_list)
 
 id_info_dict = gen_id_info_dict()
+print(len(id_info_dict))
 
 match_dataset = []
 
-for match in match_list:
+print(match_list[:2])
+
+for match in match_list[:2]:
     match_vector = []
     champ = 'default'
     for i in range(10):
@@ -156,8 +164,8 @@ for match in match_list:
 
     match_dataset.append(match_vector)
 
-print(match_dataset[:10])
+print(match_dataset)
 
-#unknown_ids = list(set(unknown_ids))
+unknown_ids = list(set(unknown_ids))
 
-#print(len(unknown_ids))
+print(len(unknown_ids))

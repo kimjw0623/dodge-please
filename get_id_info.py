@@ -70,6 +70,6 @@ with open('id_info_list_10000.csv', 'w', newline='', encoding='utf-8-sig') as cs
 
             id_info.append((champ, winrate, num_win_match, num_lose_match))
         
-        spamwriter.writerow(id_info)
+        spamwriter.writerow(summoners_id,id_info)
         
 driver.quit()
