@@ -16,29 +16,32 @@ ids = []
 total_match_info = []
 total_match_result = []
 
-with open('id_list.csv', mode='r', encoding='utf-8-sig') as inp:
+with open('id_list_15000.csv', mode='r', encoding='utf-8-sig') as inp:
     reader = csv.reader(inp)
     for rows in reader:
         ids.append(rows[1])
 
-#ids = ids[:10]
+ids = ids[:1000]
 
-with open('more_match_info_list_1000.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+with open('match_info_list_ver1.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
     for summoners_id in ids:
         print(summoners_id)
         info_url = f'https://www.op.gg/summoners/kr/{summoners_id}'
-        driver.get(info_url) 
-        driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
-        driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
-        driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
-        driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
-        time.sleep(4)
-        html = driver.page_source
-        soup = BeautifulSoup(html, 'html.parser')
-        # match_info
-        train_dataset = []
-        train_dataset_result = []
+        try:
+            driver.get(info_url) 
+            driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
+            # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
+            # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
+            # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
+            time.sleep(4)
+            html = driver.page_source
+            soup = BeautifulSoup(html, 'html.parser')
+            # match_info
+            train_dataset = []
+            train_dataset_result = []
+        except:
+            continue
 
         idx = 0
         try:

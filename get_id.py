@@ -29,7 +29,7 @@ driver = webdriver.Chrome('./chromedriver', options=options)
 
 summoners_id_list = []
 #page_num=1
-with open('id_list_10000.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+with open('id_list_15000.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
     idx = 0
     for page_num in range(1,151):

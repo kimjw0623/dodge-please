@@ -15,13 +15,13 @@ driver = webdriver.Chrome('./chromedriver', options=options)
 ids = []
 results = []
 
-with open('id_list_10000.csv', mode='r', encoding='utf-8-sig') as inp:
+with open('id_list_15000.csv', mode='r', encoding='utf-8-sig') as inp:
     reader = csv.reader(inp)
     for rows in reader:
         ids.append(rows[1])
 
 #ids = ids[:100]
-with open('id_info_list_10000.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+with open('id_info_list_15000.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
     for summoners_id in ids:
         print(summoners_id)
@@ -29,16 +29,17 @@ with open('id_info_list_10000.csv', 'w', newline='', encoding='utf-8-sig') as cs
         try:
             driver.get(winrate_url) 
         except:
-            results.append([0])
+            spamwriter.writerow(['None','None'])
             continue
-        time.sleep(5)
+        time.sleep(4)
         #driver.find_element_by_xpath('//*[@id="content-container"]/div/div/div[2]/button[2]').click()
         html = driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
         try:
             info = soup.find('table').find('tbody').find_all('tr')#, class_='rank css-1wvfkid exo2f211')
         except:
-            results.append([0])
+            spamwriter.writerow(['None','None'])
+            #results.append(['None'])
             continue
         #print(info)
         winrate = 0
@@ -70,6 +71,6 @@ with open('id_info_list_10000.csv', 'w', newline='', encoding='utf-8-sig') as cs
 
             id_info.append((champ, winrate, num_win_match, num_lose_match))
         
-        spamwriter.writerow(summoners_id,id_info)
+        spamwriter.writerow([summoners_id,id_info])
         
 driver.quit()
