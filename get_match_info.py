@@ -16,21 +16,21 @@ ids = []
 total_match_info = []
 total_match_result = []
 
-with open('id_list_15000.csv', mode='r', encoding='utf-8-sig') as inp:
+with open('data/id_list_15000.csv', mode='r', encoding='utf-8-sig') as inp:
     reader = csv.reader(inp)
     for rows in reader:
         ids.append(rows[1])
 
-ids = ids[:1000]
+ids = ids[:2000]
 
-with open('match_info_list_ver1.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+with open('match_info_list_ver5.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
     for summoners_id in ids:
         print(summoners_id)
         info_url = f'https://www.op.gg/summoners/kr/{summoners_id}'
         try:
             driver.get(info_url) 
-            driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
+            # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
             # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
             # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
             # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
@@ -50,8 +50,14 @@ with open('match_info_list_ver1.csv', 'w', newline='', encoding='utf-8-sig') as 
             continue
         
         for tag in matches:#'css-1qq23jn e1iiyghw3'):
-            if tag.find('div', class_='type').text != '솔랭':
+            game_type = tag.find('div', class_='type')
+            if game_type.text != '솔랭':
                 continue
+            time_info = game_type.find_next_sibling('div').find('div', class_='time-stamp').text
+            print(time_info)
+            if '일' in time_info:
+                continue
+
             match_length = tag.find('div', class_ = 'game-length').text
             isWin = tag.find('div').get('result')
             isWin = True if isWin=='WIN' else False
