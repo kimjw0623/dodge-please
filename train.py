@@ -48,7 +48,7 @@ class EmbeddedDataset(torch.utils.data.Dataset):
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Linear(30, 120)
+        self.fc1 = nn.Linear(50, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 1)
 
@@ -67,8 +67,8 @@ def binary_acc(y_pred, y_test):
     
     return acc
 
-train_file_name = 'data/match_info_embedded_ver5_train.csv'
-test_file_name = 'data/match_info_embedded_ver5.csv'
+train_file_name = 'data/match_info_embedded_ver6_train.csv'
+test_file_name = 'data/match_info_embedded_ver6_test.csv'
 batch_size = 32
 total_epoch = 100
 
@@ -135,6 +135,6 @@ with torch.no_grad():
         #if y_pred_tag.cpu() 
 
 
-print(correct_num)
+print(correct_num/len(y_pred_list)*100)
 y_pred_list = [a.squeeze().tolist() for a in y_pred_list]
 print(len(y_pred_list))

@@ -66,26 +66,6 @@ def gen_id_info_dict():
     #     for rows in reader:
     #         id_list.append(rows[1])
 
-    # with open('id_list_1000_2000.csv', mode='r', encoding='utf-8-sig') as inp:
-    #     reader = csv.reader(inp)
-    #     for rows in reader:
-    #         id_list.append(rows[1])
-
-    # with open('id_list_2000_4000.csv', mode='r', encoding='utf-8-sig') as inp:
-    #     reader = csv.reader(inp)
-    #     for rows in reader:
-    #         id_list.append(rows[1])
-
-    # with open('id_info_list_1000.csv', mode='r', encoding='utf-8-sig') as inp:
-    #     reader = csv.reader(inp)
-    #     for rows in reader:
-    #         info_list.append(ast.literal_eval(rows[1]))
-
-    # with open('id_info_list_1000_2000.csv', mode='r', encoding='utf-8-sig') as inp:
-    #     reader = csv.reader(inp)
-    #     for rows in reader:
-    #         info_list.append(ast.literal_eval(rows[1]))
-
     with open('data/id_info_list_15000.csv', mode='r', encoding='utf-8-sig') as inp:
         reader = csv.reader(inp)
         for rows in reader:
@@ -112,33 +92,33 @@ def gen_id_info_dict():
 
 def get_id_champ_info(info_dict, champion, player_id):
     winrate = -1
+    champ_match = -1
+    total_winrate = -1
     total_match = -1
+    total_win = 0
+    total_lose = 0
     try:
         for elem in info_dict[player_id]:
             champ = regex.sub('', elem[0]).lower()
-            if champ == 'none':
-                print('error')
-            #print(champ)
-            #print(champion)
+            total_win += elem[2]
+            total_lose += elem[3]
+            if champ == 'none': print('error')
             if champ == champion:
-                #print(elem)
                 winrate = elem[1]
-                total_match = elem[2] + elem[3]
-                # if total_match < 15:
-                #     winrate = -2
-                #     total_match = -2
+                champ_match = elem[2] + elem[3]
                 break
+        total_match = total_win + total_lose
+        total_winrate = round(total_win / total_match * 100)
     except:
         winrate = -2
+        champ_match = -2
+        total_winrate = -2
         total_match = -2
-        #print(player_id)
-        if not player_id in unknown_ids:
-            unknown_ids[player_id] = 1
-        else:
-            unknown_ids[player_id] += 1
+        if not player_id in unknown_ids: unknown_ids[player_id] = 1
+        else: unknown_ids[player_id] += 1
         #unknown_ids.append(player_id)
     
-    return winrate, total_match
+    return winrate, champ_match, total_winrate, total_match
 
 # Return champ embedding vector
 def champ_embedding():
@@ -157,7 +137,7 @@ champ_vector_dict = champ_embedding()
 
 regex = re.compile('[^a-zA-Z]')
 
-matches_1000 = get_unique_matches('data/match_info_list_ver3.csv')
+matches_1000 = get_unique_matches('data/match_info_list_ver5.csv')
 #matches_1000_2000 = get_unique_matches('match_info_list_1000_2000.csv')
 
 match_list = list(set(matches_1000))# + matches_1000_2000))
@@ -171,18 +151,21 @@ match_dataset = []
 
 #print(match_list)
 
-with open('data/match_info_embedded_ver5_train.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+with open('data/match_info_embedded_ver6_test.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
     for match in match_list:
         match_vector = []
         champ = 'default'
         for i in range(10):
             champ = regex.sub('', match[0][2*i]).lower()
-            winrate, match_count = get_id_champ_info(id_info_dict, champ, match[0][2*i + 1])
+            winrate, match_count, total_winrate, total_match = get_id_champ_info(id_info_dict, champ, match[0][2*i + 1])
             champ = int(champ_vector_dict[champ])
             match_vector.append(champ) 
             match_vector.append(int(winrate))
             match_vector.append(int(match_count))
+            match_vector.append(int(total_winrate))
+            match_vector.append(int(total_match))
+            # TODO: add whole winrate
 
         #match_dataset.append(match_vector)
         spamwriter.writerow((match_vector,match[1]))
