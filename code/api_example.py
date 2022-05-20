@@ -4,7 +4,7 @@ import requests
 # API 에서 공통적으로 사용하는 텍스트를 선언
 apiDefault = {
     'region': 'https://kr.api.riotgames.com',  # 한국서버를 대상으로 호출
-    'key': 'RGAPI-c47e074a-2eaf-4301-acd8-0e96016f12a5',  # API KEY 
+    'key': '#####',  # API KEY 
     'summonerName': 'Hide on Bush',  # 닉네임
 }
 
