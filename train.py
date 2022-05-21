@@ -1,3 +1,4 @@
+from nis import match
 import torch 
 import numpy as np
 import torch.nn as nn
@@ -35,6 +36,7 @@ class EmbeddedDataset(torch.utils.data.Dataset):
             for rows in reader:
                 #print(rows[0])
                 match_info = ast.literal_eval(rows[0])
+                match_info = self._embed_match_info(match_info)
                 res = ast.literal_eval(rows[1])
                 match_result = 0
                 if res[0]:
@@ -44,6 +46,20 @@ class EmbeddedDataset(torch.utils.data.Dataset):
                 match_result_list.append(match_result)
 
         return np.array(match_info_list).astype(np.float32), np.array(match_result_list).astype(np.float32)
+
+    def _embed_match_info(self, match_info):
+        match_info = np.array(match_info)
+        match_vector = np.zeros((10,159+2))
+        for i in range(10):
+            champ_idx = match_info[3*i]
+            champ_onehot = self._get_one_hot(champ_idx, 159)
+            match_vector[i,:] = np.concatenate(champ_onehot,match_info[3*i+1:3*i+3])
+        
+        return match_vector.flatten()
+
+    def _get_one_hot(self, targets, nb_classes):
+        res = np.eye(nb_classes)[np.array(targets).reshape(-1)]
+        return res.reshape(list(targets.shape)+[nb_classes])
         
 class Net(nn.Module):
     def __init__(self):
