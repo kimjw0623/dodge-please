@@ -60,6 +60,9 @@ class EmbeddedDataset(torch.utils.data.Dataset):
     def _get_one_hot(self, targets, nb_classes):
         res = np.eye(nb_classes)[np.array(targets).reshape(-1)]
         return res.reshape(list(targets.shape)+[nb_classes])
+
+    def _get_contrastive_vector(self):
+        return
         
 class Net(nn.Module):
     def __init__(self):
@@ -102,16 +105,12 @@ model = Net().cuda()
 criterion = nn.BCEWithLogitsLoss()#nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
+# Train
 model.train()
 for e in range(1, total_epoch):
     epoch_loss = 0
     epoch_acc = 0
     for X_batch, y_batch in training_generator:
-        #print(X_batch)
-        #print(y_batch)
-        #for i in X_batch
-        #X_batch = torch.Tensor(X_batch)
-        #y_batch = torch.Tensor(y_batch)
         X_batch, y_batch = X_batch.to(device), y_batch.to(device)
         optimizer.zero_grad()
         
@@ -131,9 +130,9 @@ for e in range(1, total_epoch):
     print(f'epoch {e}: | Loss: {avg_loss:.5f} | Acc: {avg_acc:.3f}')
 
 y_pred_list = []
-
 correct_num = 0
 
+# Test
 model.eval()
 with torch.no_grad():
     for X_batch, y_batch in testing_generator:
@@ -149,7 +148,6 @@ with torch.no_grad():
         if pred_res.squeeze().item() == gt.item():
             correct_num += 1
         #if y_pred_tag.cpu() 
-
 
 print(correct_num/len(y_pred_list)*100)
 y_pred_list = [a.squeeze().tolist() for a in y_pred_list]
