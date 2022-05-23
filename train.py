@@ -1,4 +1,4 @@
-from nis import match
+#from nis import match
 import torch 
 import numpy as np
 import torch.nn as nn
@@ -6,6 +6,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 import csv
 import ast
+
+NUM_CHAMP = 159
 
 class EmbeddedDataset(torch.utils.data.Dataset):
     def __init__(self, file_name):
@@ -53,13 +55,18 @@ class EmbeddedDataset(torch.utils.data.Dataset):
         for i in range(10):
             champ_idx = match_info[3*i]
             champ_onehot = self._get_one_hot(champ_idx, 159)
-            match_vector[i,:] = np.concatenate(champ_onehot,match_info[3*i+1:3*i+3])
+            #print(len(champ_onehot))
+            champ_add_info = np.array(match_info[3*i+1:3*i+3])#[match_info[3*i+1:3*i+3].astype(int)]
+            #print(champ_add_info)
+            match_vector[i,:] = np.concatenate([champ_onehot, champ_add_info])
+            
         
         return match_vector.flatten()
 
     def _get_one_hot(self, targets, nb_classes):
-        res = np.eye(nb_classes)[np.array(targets).reshape(-1)]
-        return res.reshape(list(targets.shape)+[nb_classes])
+        #res = np.eye(nb_classes)[np.array(targets).reshape(-1)]
+        #res_vector = 
+        return np.eye(nb_classes)[targets]
 
     def _get_contrastive_vector(self):
         return
@@ -67,7 +74,7 @@ class EmbeddedDataset(torch.utils.data.Dataset):
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Linear(50, 120)
+        self.fc1 = nn.Linear((NUM_CHAMP+2)*10, 120)#(30,120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 1)
 
@@ -86,10 +93,10 @@ def binary_acc(y_pred, y_test):
     
     return acc
 
-train_file_name = 'data/match_info_embedded_ver6_train.csv'
-test_file_name = 'data/match_info_embedded_ver6_test.csv'
+train_file_name = 'data/match_info_embedded_ver5_train.csv'
+test_file_name = 'data/match_info_embedded_ver5.csv'
 batch_size = 32
-total_epoch = 100
+total_epoch = 4000
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
