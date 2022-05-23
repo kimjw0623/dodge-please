@@ -55,17 +55,12 @@ class EmbeddedDataset(torch.utils.data.Dataset):
         for i in range(10):
             champ_idx = match_info[3*i]
             champ_onehot = self._get_one_hot(champ_idx, 159)
-            #print(len(champ_onehot))
-            champ_add_info = np.array(match_info[3*i+1:3*i+3])#[match_info[3*i+1:3*i+3].astype(int)]
-            #print(champ_add_info)
+            champ_add_info = np.array(match_info[3*i+1:3*i+3])
             match_vector[i,:] = np.concatenate([champ_onehot, champ_add_info])
             
-        
         return match_vector.flatten()
 
     def _get_one_hot(self, targets, nb_classes):
-        #res = np.eye(nb_classes)[np.array(targets).reshape(-1)]
-        #res_vector = 
         return np.eye(nb_classes)[targets]
 
     def _get_contrastive_vector(self):

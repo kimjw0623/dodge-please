@@ -137,7 +137,7 @@ champ_vector_dict = champ_embedding()
 
 regex = re.compile('[^a-zA-Z]')
 
-matches_1000 = get_unique_matches('data/match_info_list_ver5.csv')
+matches_1000 = get_unique_matches('data/match_info_list_ver_5_23.csv')
 #matches_1000_2000 = get_unique_matches('match_info_list_1000_2000.csv')
 
 match_list = list(set(matches_1000))# + matches_1000_2000))
@@ -151,7 +151,7 @@ match_dataset = []
 
 #print(match_list)
 
-with open('data/match_info_embedded_ver6_test.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+with open('data/match_info_embedded_ver_5_23_test.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
     for match in match_list:
         match_vector = []
@@ -163,8 +163,8 @@ with open('data/match_info_embedded_ver6_test.csv', 'w', newline='', encoding='u
             match_vector.append(champ) 
             match_vector.append(int(winrate))
             match_vector.append(int(match_count))
-            match_vector.append(int(total_winrate))
-            match_vector.append(int(total_match))
+            # match_vector.append(int(total_winrate))
+            # match_vector.append(int(total_match))
             # TODO: add whole winrate
 
         #match_dataset.append(match_vector)

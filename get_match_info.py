@@ -23,14 +23,14 @@ with open('data/id_list_15000.csv', mode='r', encoding='utf-8-sig') as inp:
 
 ids = ids[:2000]
 
-with open('match_info_list_ver5.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+with open('data/match_info_list_ver_5_23.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
     for summoners_id in ids:
         print(summoners_id)
         info_url = f'https://www.op.gg/summoners/kr/{summoners_id}'
         try:
             driver.get(info_url) 
-            # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
+            driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
             # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
             # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
             # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
@@ -54,9 +54,16 @@ with open('match_info_list_ver5.csv', 'w', newline='', encoding='utf-8-sig') as 
             if game_type.text != '솔랭':
                 continue
             time_info = game_type.find_next_sibling('div').find('div', class_='time-stamp').text
-            print(time_info)
+            # filter by date
             if '일' in time_info:
-                continue
+                if len(time_info) > 4: #
+                    print(time_info)
+                    print('pass')
+                    break
+                if int(time_info[0]) > 3:
+                    print(time_info)
+                    print('pass')
+                    break
 
             match_length = tag.find('div', class_ = 'game-length').text
             isWin = tag.find('div').get('result')
