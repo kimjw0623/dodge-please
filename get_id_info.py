@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 import time
 import csv
 import re
+from random import randint
 
 regex = re.compile('[^a-zA-Z]')
 
@@ -15,30 +16,60 @@ driver = webdriver.Chrome('./chromedriver', options=options)
 ids = []
 results = []
 
-with open('id_list_15000.csv', mode='r', encoding='utf-8-sig') as inp:
+with open('data/id_list_15000_5_31.csv', mode='r', encoding='utf-8-sig') as inp:
     reader = csv.reader(inp)
     for rows in reader:
         ids.append(rows[1])
 
-#ids = ids[:100]
-with open('id_info_list_15000.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+#ids = ids[1200:1203]
+with open('data/id_info_list_15000_5_31.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
+    info_url = f'https://www.op.gg/leaderboards/tier?page=1&region=kr'
+    driver.get(info_url) 
     for summoners_id in ids:
+        rand_value = randint(1, 5)
+        time.sleep(rand_value)
         print(summoners_id)
         winrate_url = f'https://www.op.gg/summoners/kr/{summoners_id}/champions'
+        tier_url = f'https://www.op.gg/summoners/kr/{summoners_id}'
+        
+        # Get tier info
         try:
-            driver.get(winrate_url) 
+            driver.get(tier_url) 
         except:
-            spamwriter.writerow(['None','None'])
+            spamwriter.writerow(['None','None','None','None'])
             continue
-        time.sleep(4)
-        #driver.find_element_by_xpath('//*[@id="content-container"]/div/div/div[2]/button[2]').click()
+    
         html = driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
         try:
+            #print(soup.find('div', class_='css-19ozhet e1sjz9pt1').find('div', class_='css-13uv2u8 e135kpg1').find('div', class_='info'))#find('div', class_='wapper').
+            tier_class = soup.find('div', class_='css-19ozhet e1sjz9pt1').find('div', class_='css-13uv2u8 e135kpg1').find('div',class_='info')
+            #print(tier_class)
+            tier_type = tier_class.find('div', class_='tier-rank').text
+            print(tier_type)
+            tier_point = tier_class.find('div', class_='tier-info').find('span', class_='lp').text[:-3]
+            print(tier_type, tier_point)
+        except:
+            print('tier lost')
+            spamwriter.writerow(['None','None','None','None'])
+            continue
+        
+        # Get champ winrate info
+        rand_value = randint(1, 5)
+        time.sleep(rand_value)
+        try:
+            driver.get(winrate_url) 
+        except:
+            spamwriter.writerow(['None','None','None','None'])
+            continue
+        html = driver.page_source
+        soup = BeautifulSoup(html, 'html.parser')
+        print('next')
+        try:
             info = soup.find('table').find('tbody').find_all('tr')#, class_='rank css-1wvfkid exo2f211')
         except:
-            spamwriter.writerow(['None','None'])
+            spamwriter.writerow(['None','None','None','None'])
             #results.append(['None'])
             continue
         #print(info)
@@ -71,6 +102,6 @@ with open('id_info_list_15000.csv', 'w', newline='', encoding='utf-8-sig') as cs
 
             id_info.append((champ, winrate, num_win_match, num_lose_match))
         
-        spamwriter.writerow([summoners_id,id_info])
+        spamwriter.writerow([summoners_id, tier_type, tier_point ,id_info])
         
 driver.quit()

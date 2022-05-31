@@ -70,8 +70,8 @@ class Net(nn.Module):
     def __init__(self):
         super().__init__()
         self.fc1 = nn.Linear((NUM_CHAMP+2)*10, 120)#(30,120)
-        self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 1)
+        self.fc2 = nn.Linear(120, 20)
+        self.fc3 = nn.Linear(20, 1)
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
@@ -88,10 +88,10 @@ def binary_acc(y_pred, y_test):
     
     return acc
 
-train_file_name = 'data/match_info_embedded_ver5_train.csv'
-test_file_name = 'data/match_info_embedded_ver5.csv'
+train_file_name = 'dataset/match_info_embedded_5_31_train.csv'#'data/match_info_embedded_ver5_train.csv'
+test_file_name = 'dataset/match_info_embedded_5_31_test.csv'#'data/match_info_embedded_5_26_5_30_test.csv'
 batch_size = 32
-total_epoch = 4000
+total_epoch = 1000
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
@@ -104,14 +104,14 @@ testing_generator = torch.utils.data.DataLoader(test_dataset, batch_size=1, shuf
 
 model = Net().cuda()
 
-criterion = nn.BCEWithLogitsLoss()#nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+criterion = nn.BCEWithLogitsLoss()#nn.CrossEntropyLoss()#
+optimizer = optim.Adam(model.parameters(), lr=0.0001)
 
 # Train
-model.train()
 for e in range(1, total_epoch):
     epoch_loss = 0
     epoch_acc = 0
+    model.train()
     for X_batch, y_batch in training_generator:
         X_batch, y_batch = X_batch.to(device), y_batch.to(device)
         optimizer.zero_grad()
@@ -130,27 +130,29 @@ for e in range(1, total_epoch):
     avg_loss = epoch_loss/len(training_generator)
     avg_acc = epoch_acc/len(training_generator)
     print(f'epoch {e}: | Loss: {avg_loss:.5f} | Acc: {avg_acc:.3f}')
+    
+    if e%10==0:
+        y_pred_list = []
+        correct_num = 0
 
-y_pred_list = []
-correct_num = 0
+        # Test
+        model.eval()
+        with torch.no_grad():
+            for X_batch, y_batch in testing_generator:
+                X_batch = X_batch.to(device)
+                y_test_pred = model(X_batch)
+                y_test_pred = torch.sigmoid(y_test_pred)
+                y_pred_tag = torch.round(y_test_pred)
+                pred_res = y_pred_tag.cpu().numpy()
+                gt = y_batch.cpu().numpy()
+                y_pred_list.append(pred_res)
+                #print(pred_res.squeeze())
+                #print(gt)
+                if pred_res.squeeze().item() == gt.item():
+                    correct_num += 1
+                #if y_pred_tag.cpu() 
 
-# Test
-model.eval()
-with torch.no_grad():
-    for X_batch, y_batch in testing_generator:
-        X_batch = X_batch.to(device)
-        y_test_pred = model(X_batch)
-        y_test_pred = torch.sigmoid(y_test_pred)
-        y_pred_tag = torch.round(y_test_pred)
-        pred_res = y_pred_tag.cpu().numpy()
-        gt = y_batch.cpu().numpy()
-        y_pred_list.append(pred_res)
-        #print(pred_res.squeeze())
-        #print(gt)
-        if pred_res.squeeze().item() == gt.item():
-            correct_num += 1
-        #if y_pred_tag.cpu() 
+        print(f'acc: {correct_num/len(y_pred_list)*100: .3f}')
+        y_pred_list = [a.squeeze().tolist() for a in y_pred_list]
+        # print(len(y_pred_list))
 
-print(correct_num/len(y_pred_list)*100)
-y_pred_list = [a.squeeze().tolist() for a in y_pred_list]
-print(len(y_pred_list))

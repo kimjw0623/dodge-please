@@ -66,12 +66,12 @@ def gen_id_info_dict():
     #     for rows in reader:
     #         id_list.append(rows[1])
 
-    with open('data/id_info_list_15000.csv', mode='r', encoding='utf-8-sig') as inp:
+    with open('data/id_info_list_15000_5_24.csv', mode='r', encoding='utf-8-sig') as inp:
         reader = csv.reader(inp)
         for rows in reader:
             if rows[0] == 'None':
                 continue
-            id_info_rows = ast.literal_eval(rows[1])
+            id_info_rows = ast.literal_eval(rows[3])
             if len(id_info_rows) == 0:
                 continue
             if id_info_rows[0][0] == 'none':
@@ -80,7 +80,7 @@ def gen_id_info_dict():
             #for i in rows:
             #    small_list.append(ast.literal_eval(i))
 
-            info_list.append(ast.literal_eval(rows[1]))
+            info_list.append(id_info_rows)
             id_list.append(rows[0])
 
     assert len(id_list) == len(info_list)
@@ -104,11 +104,11 @@ def get_id_champ_info(info_dict, champion, player_id):
             total_lose += elem[3]
             if champ == 'none': print('error')
             if champ == champion:
-                winrate = elem[1]
-                champ_match = elem[2] + elem[3]
+                winrate = int(elem[1])
+                champ_match = int(elem[2] + elem[3])
                 break
         total_match = total_win + total_lose
-        total_winrate = round(total_win / total_match * 100)
+        total_winrate = int(round(total_win / total_match * 100))
     except:
         winrate = -2
         champ_match = -2
@@ -137,7 +137,7 @@ champ_vector_dict = champ_embedding()
 
 regex = re.compile('[^a-zA-Z]')
 
-matches_1000 = get_unique_matches('data/match_info_list_ver_5_23.csv')
+matches_1000 = get_unique_matches('data/match_info_list_ver_5_26_5_30.csv')
 #matches_1000_2000 = get_unique_matches('match_info_list_1000_2000.csv')
 
 match_list = list(set(matches_1000))# + matches_1000_2000))
@@ -151,24 +151,30 @@ match_dataset = []
 
 #print(match_list)
 
-with open('data/match_info_embedded_ver_5_23_test.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+with open('data/match_info_embedded_5_26_5_30_test.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
     for match in match_list:
         match_vector = []
         champ = 'default'
+        is_invalid = 0
         for i in range(10):
             champ = regex.sub('', match[0][2*i]).lower()
             winrate, match_count, total_winrate, total_match = get_id_champ_info(id_info_dict, champ, match[0][2*i + 1])
             champ = int(champ_vector_dict[champ])
             match_vector.append(champ) 
-            match_vector.append(int(winrate))
-            match_vector.append(int(match_count))
+            match_vector.append(int(winrate)/100)
+            match_vector.append(int(match_count)/200)
             # match_vector.append(int(total_winrate))
             # match_vector.append(int(total_match))
+            
+            if match_count == -2:
+                is_invalid += 1 
+            
             # TODO: add whole winrate
 
         #match_dataset.append(match_vector)
-        spamwriter.writerow((match_vector,match[1]))
+        if is_invalid < 3:
+            spamwriter.writerow((match_vector,match[1]))
 
 #print(len(match_dataset))
 

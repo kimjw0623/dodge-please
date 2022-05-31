@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 import time
 import csv
 import re
+from random import randint
 
 regex = re.compile('[^a-zA-Z]')
 
@@ -16,14 +17,14 @@ ids = []
 total_match_info = []
 total_match_result = []
 
-with open('data/id_list_15000.csv', mode='r', encoding='utf-8-sig') as inp:
+with open('data/id_list_15000_5_24.csv', mode='r', encoding='utf-8-sig') as inp:
     reader = csv.reader(inp)
     for rows in reader:
         ids.append(rows[1])
 
-ids = ids[:2000]
+ids = ids[:3000]
 
-with open('data/match_info_list_ver_5_23.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
+with open('data/match_info_list_ver_5_26_5_30.csv', 'w', newline='', encoding='utf-8-sig') as csvfile:
     spamwriter = csv.writer(csvfile)
     for summoners_id in ids:
         print(summoners_id)
@@ -31,10 +32,12 @@ with open('data/match_info_list_ver_5_23.csv', 'w', newline='', encoding='utf-8-
         try:
             driver.get(info_url) 
             driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
-            # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
-            # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
-            # driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
-            time.sleep(4)
+            driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
+            time.sleep(0.5)
+            driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
+            driver.find_element_by_xpath('//*[@id="__next"]/div[5]/div[2]/button').click()
+            rand_value = randint(1, 6)
+            time.sleep(rand_value)
             html = driver.page_source
             soup = BeautifulSoup(html, 'html.parser')
             # match_info
@@ -60,7 +63,7 @@ with open('data/match_info_list_ver_5_23.csv', 'w', newline='', encoding='utf-8-
                     print(time_info)
                     print('pass')
                     break
-                if int(time_info[0]) > 3:
+                if int(time_info[0]) > 5:
                     print(time_info)
                     print('pass')
                     break
